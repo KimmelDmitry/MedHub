@@ -1,4 +1,4 @@
-﻿using MedHub.Infrastructure.Outbox;
+﻿using MedHub.Infrastructure.BackgroundJobs.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\MedHub.Infrastructure\MedHub.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Media\Contracts\" />
+  </ItemGroup>
+
 </Project>

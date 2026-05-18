@@ -40,9 +40,12 @@ public sealed class Course : Entity
         if (titleResult.IsFailure)
             return Result.Failure<Course>(titleResult.Error);
 
-        var courseDescription = CourseDescription.Create(description);
+        var descriptionResult = CourseDescription.Create(description);
+        
+        if (descriptionResult.IsFailure)
+            return Result.Failure<Course>(descriptionResult.Error);
 
-        var course = new Course(Guid.NewGuid(), titleResult.Value, courseDescription, creatorId);
+        var course = new Course(Guid.NewGuid(), titleResult.Value, descriptionResult.Value, creatorId);
         
         return Result.Success(course);
     }
@@ -88,6 +91,18 @@ public sealed class Course : Entity
             return Result.Failure(titleResult.Error);
 
         Title = titleResult.Value;
+        return Result.Success();
+    }
+    
+    public Result UpdateDescription(string? description)
+    {
+        var result = CourseDescription.Create(description);
+
+        if (result.IsFailure)
+            return Result.Failure(result.Error);
+
+        Description = result.Value;
+
         return Result.Success();
     }
 }

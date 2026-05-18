@@ -1,15 +1,24 @@
-﻿namespace MedHub.Domain.Courses.ValueObjects;
+﻿using MedHub.Domain.Abstractions;
 
-public record CourseDescription
+namespace MedHub.Domain.Courses.ValueObjects;
+
+public sealed record CourseDescription
 {
     public string Value { get; }
 
-    private CourseDescription(string value) => Value = value ?? string.Empty;
+    private  const int MAX_LENGTH = 2000;
+    
+    private CourseDescription(string value) => Value = value;
 
-    public static CourseDescription Create(string? description)
+    public static readonly Error InvalidLength = new(
+        "CourseTitle.InvalidLength", 
+        $"Длина описания курса должна быть до {MAX_LENGTH} символов");
+
+    
+    public static Result<CourseDescription> Create(string? description)
     {
-        if (!string.IsNullOrEmpty(description) && description.Length > 2000)
-            throw new ApplicationException("Описание слишком длинное");
+        if (!string.IsNullOrEmpty(description) && description.Length > MAX_LENGTH)
+            return Result.Failure<CourseDescription>(InvalidLength);
 
         return new CourseDescription(description ?? string.Empty);
     }

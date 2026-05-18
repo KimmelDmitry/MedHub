@@ -1,7 +1,7 @@
 ﻿using MedHub.Application.Abstractions.Clock;
 using MedHub.Application.Exceptions;
 using MedHub.Domain.Abstractions;
-using MedHub.Infrastructure.Outbox;
+using MedHub.Infrastructure.BackgroundJobs.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 

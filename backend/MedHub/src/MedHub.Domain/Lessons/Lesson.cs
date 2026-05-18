@@ -2,6 +2,7 @@
 using MedHub.Domain.Courses;
 using MedHub.Domain.Lessons.DomainEvents;
 using MedHub.Domain.Lessons.ValueObjects;
+using MedHub.Domain.Media;
 
 namespace MedHub.Domain.Lessons;
 
@@ -35,9 +36,14 @@ public sealed class Lesson : Entity
     public string ContentUrl { get; private set; } = string.Empty;
     public LessonStatus Status { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; private set; }
+    
+    public Guid? VideoId { get; private set; }
+
+    public bool HasVideo => VideoId.HasValue;
+    
 
     // Навигационные свойства 
-    // public ICollection<VideoMaterial> VideoMaterials { get; private set; } = new List<VideoMaterial>();
     //public ICollection<Question> Questions { get; private set; } = new List<Question>();
 
     
@@ -70,6 +76,35 @@ public sealed class Lesson : Entity
         return Result.Success(lesson);
     }
 
+    public Result AttachVideo(Guid videoId)
+    {
+        if (videoId == Guid.Empty)
+        {
+            return Result.Failure(
+                new Error(
+                    "Lesson.InvalidVideo",
+                    "VideoId обязателен"));
+        }
+
+        if (VideoId.HasValue)
+        {
+            return Result.Failure(
+                new Error(
+                    "Lesson.VideoAlreadyAttached",
+                    "Видео уже прикреплено"));
+        }
+
+        VideoId = videoId;
+
+        UpdatedAt = DateTime.UtcNow;
+
+        RaiseDomainEvent(
+            new LessonVideoAttachedEvent(
+                Id,
+                videoId));
+
+        return Result.Success();
+    }
    
     public Result Publish()
     {
@@ -110,6 +145,18 @@ public sealed class Lesson : Entity
             return Result.Failure(orderResult.Error);
 
         OrderNumber = orderResult.Value;
+        return Result.Success();
+    }
+    
+    public Result UpdateTitle(string newTitle)
+    {
+        var titleResult = LessonTitle.Create(newTitle);
+
+        if (titleResult.IsFailure)
+            return Result.Failure(titleResult.Error);
+
+        Title = titleResult.Value;
+
         return Result.Success();
     }
 

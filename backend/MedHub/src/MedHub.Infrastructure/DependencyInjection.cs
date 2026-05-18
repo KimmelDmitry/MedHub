@@ -1,4 +1,7 @@
-﻿using Asp.Versioning;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Asp.Versioning;
 using MedHub.Application.Abstractions.Authentication;
 using MedHub.Application.Abstractions.Caching;
 using MedHub.Application.Abstractions.Clock;
@@ -12,9 +15,20 @@ using MedHub.Infrastructure.Caching;
 using MedHub.Infrastructure.Clock;
 using MedHub.Infrastructure.Data;
 using MedHub.Infrastructure.Email;
-using MedHub.Infrastructure.Outbox;
 using MedHub.Infrastructure.Repositories;
 using Dapper;
+using MedHub.Application.Abstractions.Media;
+using MedHub.Application.Abstractions.Storage;
+using MedHub.Application.Media.Options;
+using MedHub.Application.Media.Services;
+using MedHub.Domain.Attempts;
+using MedHub.Domain.Checkpoints;
+using MedHub.Domain.Courses;
+using MedHub.Domain.Lessons;
+using MedHub.Domain.Media;
+using MedHub.Infrastructure.BackgroundJobs.MediaProcessing;
+using MedHub.Infrastructure.BackgroundJobs.Outbox;
+using MedHub.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -46,6 +60,8 @@ public static class DependencyInjection
 
         AddAuthentication(services, configuration);
 
+        AddFileStorage(services, configuration);
+
         AddAuthorization(services);
 
         AddHealthChecks(services, configuration);
@@ -53,6 +69,8 @@ public static class DependencyInjection
         AddApiVersioning(services);
 
         AddBackgroundJobs(services, configuration);
+
+        AddVideoProcessing(services, configuration);
 
         return services;
     }
@@ -67,8 +85,14 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });
 
+        services.AddScoped<ICheckpointRepository, CheckpointRepository>();
+        services.AddScoped<IAttemptRepository, AttemptRepository>();
+        services.AddScoped<IQuestionRepository, QuestionRepository>();
         
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<ILessonRepository, LessonRepository>();
+        services.AddScoped<IVideoRepository, VideoRepository>();
         
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
@@ -134,6 +158,31 @@ public static class DependencyInjection
         services.AddSingleton<ICacheService, CacheService>();
     }
 
+    private static void AddFileStorage(IServiceCollection services, IConfiguration configuration)
+    {
+        // 1. Регистрация настроек
+        services.Configure<FileStorageOptions>(configuration.GetSection("FileStorage"));
+    
+        // 2. Регистрация клиента Amazon S3
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<FileStorageOptions>>().Value;
+    
+            var config = new AmazonS3Config
+            {
+                ServiceURL = options.Endpoint,
+                ForcePathStyle = true, 
+            
+                UseHttp = !options.UseHttps 
+            };
+
+            return new AmazonS3Client(options.AccessKey, options.SecretKey, config);
+        });
+
+        // 3. Регистрация провайдера
+        services.AddScoped<IVideoStorageProvider, S3VideoStorageProvider>();
+    }
+
     private static void AddHealthChecks(IServiceCollection services, IConfiguration configuration)
     {
         var healthChecksBuilder = services.AddHealthChecks()
@@ -184,5 +233,20 @@ public static class DependencyInjection
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.ConfigureOptions<ProcessOutboxMessagesJobSetup>();
+    }
+    
+    private static void AddVideoProcessing(IServiceCollection services, IConfiguration configuration)
+    {
+        //  Options
+        services.Configure<VideoProcessingOptions>(
+            configuration.GetSection(VideoProcessingOptions.SectionName));
+
+        //  Domain services
+        services.AddScoped<IVideoProbeAnalyzer, FfprobeVideoAnalyzer>();
+        services.AddScoped<IVideoTranscoder, FfmpegVideoTranscoder>();
+        services.AddScoped<IVideoProcessingService, VideoProcessingService>();
+
+        //  Quartz Job
+        services.ConfigureOptions<VideoProcessingJobSetup>();
     }
 }

@@ -12,6 +12,45 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
 
         builder.HasKey(permission => permission.Id);
 
-        builder.HasData(Permission.UsersRead);
+        builder.HasData(
+            Permission.UsersRead,
+
+            Permission.CoursesRead,
+            Permission.CoursesCreate,
+            Permission.CoursesUpdate,
+            Permission.CoursesDelete,
+            Permission.CoursesPublish,
+            Permission.CoursesArchive,
+
+            Permission.LessonsRead,
+            Permission.LessonsCreate,
+            Permission.LessonsUpdate,
+            Permission.LessonsDelete,
+            Permission.LessonsPublish,
+            Permission.LessonsArchive,
+
+            Permission.CheckpointsRead,
+            Permission.CheckpointsCreate,
+            Permission.CheckpointsUpdate,
+            Permission.CheckpointsDelete,
+            Permission.CheckpointsPublish,
+            Permission.CheckpointsArchive,
+
+            Permission.QuestionsRead,
+            Permission.QuestionsCreate,
+            Permission.QuestionsUpdate,
+            Permission.QuestionsDelete,
+
+            Permission.AttemptsRead,
+            Permission.AttemptsStart,
+            Permission.AttemptsSubmit,
+            Permission.AttemptsCancel,
+            Permission.AttemptsEvaluate,
+
+            Permission.MediaRead,
+            Permission.MediaUpload,
+            Permission.MediaDelete,
+            Permission.MediaProcess
+        );
     }
 }
