@@ -40,6 +40,17 @@ public sealed class User : Entity
         return user;
     }
 
+    public static User CreateTeacher(FirstName firstName, LastName lastName, Email email)
+    {
+        var user = new User(Guid.NewGuid(), firstName, lastName, email);
+
+        user.RaiseDomainEvent(new UserCreatedDomainEvent(user.Id));
+
+        user._roles.Add(Role.Teacher);
+
+        return user;
+    }
+
     public void SetIdentityId(string identityId)
     {
         IdentityId = identityId;

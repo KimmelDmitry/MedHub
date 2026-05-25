@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { AxiosResponse } from 'axios';
 import { api, clearAuthTokens, getStoredTokens, setAuthTokens, type AuthTokens } from '../../../app/api/client';
-import type { LogInUserRequest, RegisterUserRequest } from '../../../generated/myApi';
-import { AuthContext, type UserProfile } from './auth-context';
+import { ContentType, type LogInUserRequest } from '../../../generated/myApi';
+import { AuthContext, type RegisterPayload, type UserProfile } from './auth-context';
 
 type TokenPayload = {
   accessToken?: string | null;
@@ -103,9 +103,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: loginWithCredentials,
   });
 
-  const registerMutation = useMutation<void, Error, RegisterUserRequest>({
+  const registerMutation = useMutation<void, Error, RegisterPayload>({
     mutationFn: async (payload) => {
-      const response = (await api.api.v1UsersRegisterCreate(payload)) as unknown as AxiosResponse<unknown>;
+      const { teacherRegistrationCode, ...registerPayload } = payload;
+      const response = teacherRegistrationCode
+        ? ((await api.request({
+            path: '/api/v1/users/register-teacher',
+            method: 'POST',
+            body: {
+              ...registerPayload,
+              teacherRegistrationCode,
+            },
+            type: ContentType.Json,
+          })) as unknown as AxiosResponse<unknown>)
+        : ((await api.api.v1UsersRegisterCreate(registerPayload)) as unknown as AxiosResponse<unknown>);
       const registerTokens = extractTokens(response);
 
       if (registerTokens?.accessToken) {

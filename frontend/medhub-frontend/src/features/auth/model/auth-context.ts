@@ -2,6 +2,10 @@ import { createContext } from 'react';
 import type { AuthTokens } from '../../../app/api/client';
 import type { LogInUserRequest, RegisterUserRequest } from '../../../generated/myApi';
 
+export type RegisterPayload = RegisterUserRequest & {
+  teacherRegistrationCode?: string;
+};
+
 export interface UserProfile {
   id?: string;
   email?: string;
@@ -23,7 +27,7 @@ export interface AuthContextValue {
   isPending: boolean;
   error: Error | null;
   login: (credentials: LogInUserRequest) => Promise<void>;
-  register: (payload: RegisterUserRequest) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
   refetchProfile: () => Promise<unknown>;
 }

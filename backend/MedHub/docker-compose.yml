@@ -38,6 +38,7 @@ services:
       - Keycloak__BaseUrl=http://medhub-idp:8080
       - FileStorage__Endpoint=http://host.docker.internal:9000
       - VideoProcessing__TempRootPath=/tmp/medhub-videos
+      - DemoAuth__TeacherRegistrationCode=teacher-demo
       
     healthcheck:
       test: ["CMD-SHELL", "dotnet --list-runtimes >/dev/null || exit 1"]

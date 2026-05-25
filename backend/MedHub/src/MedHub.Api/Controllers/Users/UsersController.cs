@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using MedHub.Application.Users.GetLoggedInUser;
 using MedHub.Application.Users.LogInUser;
+using MedHub.Application.Users.RegisterTeacher;
 using MedHub.Application.Users.RegisterUser;
 using MedHub.Infrastructure.Authorization;
 using MediatR;
@@ -43,6 +44,29 @@ public class UsersController : ControllerBase
             request.FirstName,
             request.LastName,
             request.Password);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("register-teacher")]
+    public async Task<IActionResult> RegisterTeacher(
+        RegisterTeacherRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RegisterTeacherCommand(
+            request.Email,
+            request.FirstName,
+            request.LastName,
+            request.Password,
+            request.TeacherRegistrationCode);
 
         var result = await _sender.Send(command, cancellationToken);
 

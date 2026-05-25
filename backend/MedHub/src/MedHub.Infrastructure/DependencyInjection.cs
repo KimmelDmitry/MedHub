@@ -137,6 +137,8 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.AddScoped<IUserContext, UserContext>();
+
+        services.AddSingleton<ITeacherRegistrationCodeValidator, TeacherRegistrationCodeValidator>();
     }
 
     private static void AddAuthorization(IServiceCollection services)

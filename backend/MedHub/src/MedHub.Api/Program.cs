@@ -57,7 +57,7 @@ if (app.Environment.IsDevelopment())
         }
     });
 
-    //app.ApplyMigrations();
+    app.ApplyMigrations();
 
    
     // app.SeedData();

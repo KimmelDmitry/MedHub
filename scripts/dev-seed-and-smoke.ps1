@@ -772,6 +772,36 @@ $foreignStudentToken = Ensure-User -Email $ForeignStudentEmail -Password $Foreig
 
 Add-Step -Name "teacher login" -Method "POST" -Path "/users/login" -Status 200 -Expected "200" -Passed $true
 
+$registeredTeacherEmail = "teacher-registered-smoke-$([guid]::NewGuid().ToString('N').Substring(0, 8))@mail.ru"
+$registeredTeacherPassword = "teacher-reg-Wem-rHr-UwZ"
+
+Invoke-Expected -Name "teacher registration rejects invalid code" -Method "POST" -Path "/users/register-teacher" -ExpectedStatus @(400) -Body @{
+    email = "teacher-invalid-$([guid]::NewGuid().ToString('N').Substring(0, 8))@mail.ru"
+    firstName = "Invalid"
+    lastName = "Teacher"
+    password = $registeredTeacherPassword
+    teacherRegistrationCode = "wrong-code"
+} | Out-Null
+
+$registeredTeacher = Invoke-Expected -Name "teacher registers with invite code" -Method "POST" -Path "/users/register-teacher" -ExpectedStatus @(200) -Body @{
+    email = $registeredTeacherEmail
+    firstName = "Registered"
+    lastName = "Teacher"
+    password = $registeredTeacherPassword
+    teacherRegistrationCode = "teacher-demo"
+}
+
+if ($registeredTeacher.status -eq 200) {
+    $registeredTeacherLogin = Invoke-Expected -Name "registered teacher login" -Method "POST" -Path "/users/login" -ExpectedStatus @(200) -Body @{
+        email = $registeredTeacherEmail
+        password = $registeredTeacherPassword
+    }
+
+    if ($registeredTeacherLogin.status -eq 200) {
+        Invoke-Expected -Name "registered teacher can access courses" -Method "GET" -Path "/courses" -Token $registeredTeacherLogin.data.accessToken -ExpectedStatus @(200) | Out-Null
+    }
+}
+
 $course1 = Ensure-Course -Token $teacherToken -Title "$prefix Anatomy Foundations" -Description "Human anatomy basics for first-year students."
 $course2 = Ensure-Course -Token $teacherToken -Title "$prefix Cardiology Practice" -Description "Clinical cardiology practice with checkpoints."
 $course3 = Ensure-Course -Token $teacherToken -Title "$prefix Video Checkpoints Lab" -Description "Authoring lab for video checkpoints."
