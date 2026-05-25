@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using MedHub.Application.Abstractions.Authentication;
 using MedHub.Application.Abstractions.Data;
@@ -32,16 +32,33 @@ internal sealed class GetActiveAttemptForLessonQueryHandler
 
         const string sql = """
             SELECT
-                id AS AttemptId,
-                lesson_id AS LessonId,
-                user_id AS UserId,
-                started_at_utc AS StartedAtUtc,
-                status AS Status,
-                current_question_index AS CurrentQuestionIndex
-            FROM attempts
-            WHERE lesson_id = @LessonId
-              AND user_id = @UserId
-              AND status = @Status
+                a.id AS AttemptId,
+                a.lesson_id AS LessonId,
+                a.student_id AS StudentId,
+                a.started_at AS StartedAt,
+                a.status AS Status,
+                COALESCE(
+                    array_agg(aa.question_id) FILTER (WHERE aa.question_id IS NOT NULL),
+                    ARRAY[]::uuid[]
+                ) AS AnsweredQuestionIds
+            FROM attempts a
+            LEFT JOIN attempt_answers aa ON aa.attempt_id = a.id
+            WHERE a.lesson_id = @LessonId
+              AND a.student_id = @StudentId
+              AND a.status = @Status
+              AND EXISTS (
+                  SELECT 1
+                  FROM lessons l
+                  INNER JOIN courses c ON c.id = l.course_id
+                  INNER JOIN enrollments e
+                      ON e.course_id = c.id
+                     AND e.student_id = a.student_id
+                     AND e.status = 'Active'
+                  WHERE l.id = a.lesson_id
+                    AND l.status = 'Published'
+                    AND c.status = 'Published'
+              )
+            GROUP BY a.id, a.lesson_id, a.student_id, a.started_at, a.status
             LIMIT 1
             """;
 
@@ -51,8 +68,8 @@ internal sealed class GetActiveAttemptForLessonQueryHandler
                 new
                 {
                     request.LessonId,
-                    UserId = _userContext.UserId,
-                    Status = (int)AttemptStatus.InProgress
+                    StudentId = _userContext.UserId,
+                    Status = AttemptStatus.InProgress.ToString()
                 });
 
         if (attempt is null)

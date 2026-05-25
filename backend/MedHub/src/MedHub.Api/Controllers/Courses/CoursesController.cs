@@ -1,6 +1,7 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using MedHub.Application.Courses.ArchiveCourse;
 using MedHub.Application.Courses.CreateCourse;
+using MedHub.Application.Courses.GetCourses;
 using MedHub.Application.Courses.GetCourseById;
 using MedHub.Application.Courses.PublishCourse;
 using MedHub.Application.Courses.UpdateCourseDescription;
@@ -26,6 +27,26 @@ public sealed class CoursesController : ControllerBase
     }
 
     /// <summary>
+    /// Получить курсы текущего преподавателя
+    /// </summary>
+    [HttpGet]
+    [HasPermission(Permissions.CoursesRead)]
+    public async Task<IActionResult> GetCourses(CancellationToken cancellationToken)
+    {
+        var query = new GetCoursesQuery();
+
+        Result<IReadOnlyList<CourseListItemResponse>> result =
+            await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
+
+    /// <summary>
     /// Получить курс по Id
     /// </summary>
     [HttpGet("{courseId:guid}")]
@@ -46,7 +67,7 @@ public sealed class CoursesController : ControllerBase
 
         return Ok(result.Value);
     }
-    
+
     /// <summary>
     /// Получить структуру курса
     /// </summary>

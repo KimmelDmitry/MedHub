@@ -7,6 +7,9 @@ public static class CheckpointErrors
     public static readonly Error NotFound =
         new("Checkpoint.NotFound", "Контрольная точка не найдена");
 
+    public static readonly Error AlreadyPublished =
+        new("Checkpoint.AlreadyPublished", "Контрольная точка уже опубликована");
+
     public static readonly Error InvalidTimestamp =
         new("Checkpoint.InvalidTimestamp", "Некорректный таймкод");
 

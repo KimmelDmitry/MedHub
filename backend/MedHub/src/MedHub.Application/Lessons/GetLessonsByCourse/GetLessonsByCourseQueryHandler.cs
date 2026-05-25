@@ -26,11 +26,11 @@ internal sealed class GetLessonsByCourseQueryHandler : IQueryHandler<GetLessonsB
                            SELECT 
                                l.id AS Id,
                                l.title AS Title,
-                               l.order_number AS [Order],
+                               l.order_number AS "Order",
                                l.content_type AS ContentType,
-                               CASE WHEN v.id IS NOT NULL THEN 1 ELSE 0 END AS HasVideo
+                               (v.id IS NOT NULL) AS HasVideo
                            FROM lessons AS l
-                           LEFT JOIN video_materials AS v ON v.lesson_id = l.id
+                           LEFT JOIN videos AS v ON v.lesson_id = l.id
                            WHERE l.course_id = @CourseId
                            ORDER BY l.order_number ASC
                            """;

@@ -1,13 +1,13 @@
 ﻿using Asp.Versioning;
 using MedHub.Application.Media.AbortVideoUpload;
 using MedHub.Application.Media.CompleteVideoUpload;
+using MedHub.Application.Media.GetVideoHlsFile;
 using MedHub.Application.Media.GetVideoPlayback;
 using MedHub.Application.Media.GetVideoStatus;
 using MedHub.Application.Media.StartVideoUpload;
 using MedHub.Domain.Abstractions;
 using MedHub.Infrastructure.Authorization;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MedHub.Api.Controllers.Media;
@@ -44,6 +44,17 @@ public sealed class MediaController : ControllerBase
 
         if (result.IsFailure)
         {
+            if (result.Error.Code == "Video.Forbidden" ||
+                result.Error.Code.EndsWith(".Required", StringComparison.Ordinal))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, result.Error);
+            }
+
+            if (result.Error.Code.EndsWith(".NotFound", StringComparison.Ordinal))
+            {
+                return NotFound(result.Error);
+            }
+
             return BadRequest(result.Error);
         }
 
@@ -134,9 +145,62 @@ public sealed class MediaController : ControllerBase
 
         if (result.IsFailure)
         {
+            if (result.Error.Code == "Video.Forbidden" ||
+                result.Error.Code.EndsWith(".Required", StringComparison.Ordinal))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, result.Error);
+            }
+
+            if (result.Error.Code.EndsWith(".NotFound", StringComparison.Ordinal))
+            {
+                return NotFound(result.Error);
+            }
+
             return BadRequest(result.Error);
         }
 
         return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Получить HLS playlist или segment через защищенный API proxy
+    /// </summary>
+    [HttpGet("videos/{videoId:guid}/hls/{fileName}")]
+    [HasPermission(Permissions.MediaRead)]
+    public async Task<IActionResult> GetHlsFile(
+        Guid videoId,
+        string fileName,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetVideoHlsFileQuery(videoId, fileName);
+
+        Result<VideoHlsFileResponse> result =
+            await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            if (result.Error.Code == "Video.Forbidden" ||
+                result.Error.Code.EndsWith(".Required", StringComparison.Ordinal))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, result.Error);
+            }
+
+            if (result.Error.Code.EndsWith(".NotFound", StringComparison.Ordinal))
+            {
+                return NotFound(result.Error);
+            }
+
+            return BadRequest(result.Error);
+        }
+
+        if (result.Value.ContentLength.HasValue)
+        {
+            Response.ContentLength = result.Value.ContentLength.Value;
+        }
+
+        return new FileStreamResult(result.Value.Content, result.Value.ContentType)
+        {
+            EnableRangeProcessing = true
+        };
     }
 }

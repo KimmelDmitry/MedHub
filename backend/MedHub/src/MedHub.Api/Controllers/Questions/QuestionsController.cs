@@ -65,7 +65,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpPost("checkpoints/{checkpointId:guid}/questions")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsCreate)]
     public async Task<IActionResult> Create(
         Guid checkpointId,
         [FromBody] CreateQuestionRequest request,
@@ -91,7 +91,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpPatch("questions/{questionId:guid}/text")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsUpdate)]
     public async Task<IActionResult> UpdateText(
         Guid questionId,
         [FromBody] UpdateQuestionTextRequest request,
@@ -110,7 +110,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpPatch("questions/{questionId:guid}/settings")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsUpdate)]
     public async Task<IActionResult> UpdateSettings(
         Guid questionId,
         [FromBody] UpdateQuestionSettingsRequest request,
@@ -134,7 +134,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpPost("questions/{questionId:guid}/options")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsUpdate)]
     public async Task<IActionResult> AddOption(
         Guid questionId,
         [FromBody] AddAnswerOptionRequest request,
@@ -156,7 +156,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpPatch("questions/{questionId:guid}/options/{answerOptionId:guid}")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsUpdate)]
     public async Task<IActionResult> UpdateOption(
         Guid questionId,
         Guid answerOptionId,
@@ -180,7 +180,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpDelete("questions/{questionId:guid}/options/{answerOptionId:guid}")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsUpdate)]
     public async Task<IActionResult> RemoveOption(
         Guid questionId,
         Guid answerOptionId,
@@ -199,7 +199,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     [HttpDelete("questions/{questionId:guid}")]
-    [HasPermission(Permissions.QuestionsWrite)]
+    [HasPermission(Permissions.QuestionsDelete)]
     public async Task<IActionResult> Delete(
         Guid questionId,
         CancellationToken cancellationToken)

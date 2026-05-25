@@ -24,6 +24,7 @@ using MedHub.Application.Media.Services;
 using MedHub.Domain.Attempts;
 using MedHub.Domain.Checkpoints;
 using MedHub.Domain.Courses;
+using MedHub.Domain.Enrollments;
 using MedHub.Domain.Lessons;
 using MedHub.Domain.Media;
 using MedHub.Infrastructure.BackgroundJobs.MediaProcessing;
@@ -88,6 +89,7 @@ public static class DependencyInjection
         services.AddScoped<ICheckpointRepository, CheckpointRepository>();
         services.AddScoped<IAttemptRepository, AttemptRepository>();
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();

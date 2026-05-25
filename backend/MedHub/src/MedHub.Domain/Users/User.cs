@@ -44,4 +44,5 @@ public sealed class User : Entity
     {
         IdentityId = identityId;
     }
+    
 }

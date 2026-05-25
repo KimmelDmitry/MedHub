@@ -24,7 +24,7 @@ public sealed class AttemptsController : ControllerBase
     }
 
     [HttpPost("lessons/{lessonId:guid}/attempts/start")]
-    [HasPermission(Permissions.AttemptsWrite)]
+    [HasPermission(Permissions.AttemptsStart)]
     public async Task<IActionResult> Start(
         Guid lessonId,
         CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ public sealed class AttemptsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
@@ -53,14 +53,14 @@ public sealed class AttemptsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return NotFound(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
     }
 
     [HttpPost("attempts/{attemptId:guid}/answers")]
-    [HasPermission(Permissions.AttemptsWrite)]
+    [HasPermission(Permissions.AttemptsSubmit)]
     public async Task<IActionResult> SubmitAnswer(
         Guid attemptId,
         [FromBody] SubmitCheckpointAnswerRequest request,
@@ -76,14 +76,14 @@ public sealed class AttemptsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
     }
 
     [HttpPost("attempts/{attemptId:guid}/complete")]
-    [HasPermission(Permissions.AttemptsWrite)]
+    [HasPermission(Permissions.AttemptsSubmit)]
     public async Task<IActionResult> Complete(
         Guid attemptId,
         CancellationToken cancellationToken)
@@ -94,7 +94,7 @@ public sealed class AttemptsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
@@ -112,9 +112,29 @@ public sealed class AttemptsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return NotFound(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
+    }
+
+    private ObjectResult HandleFailure(Error error)
+    {
+        if (error.Code.EndsWith(".NotFound", StringComparison.Ordinal))
+        {
+            return NotFound(error);
+        }
+
+        if (error.Code.EndsWith(".Forbidden", StringComparison.Ordinal))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, error);
+        }
+
+        if (error.Code.EndsWith(".Required", StringComparison.Ordinal))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, error);
+        }
+
+        return BadRequest(error);
     }
 }

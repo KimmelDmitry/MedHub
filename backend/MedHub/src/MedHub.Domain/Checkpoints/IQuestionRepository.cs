@@ -12,5 +12,9 @@ public interface IQuestionRepository
         Guid checkpointId,
         CancellationToken cancellationToken = default);
 
+    void Add(Question question);
+
+    void AddAnswerOption(AnswerOption answerOption);
+
     void Remove(Question question);
 }

@@ -109,10 +109,7 @@ public sealed class Lesson : Entity
     public Result Publish()
     {
         if (Status == LessonStatus.Published)
-            return Result.Success(); 
-
-        if (Status == LessonStatus.Archived)
-            return Result.Failure(LessonErrors.InvalidStatusTransition);
+            return Result.Failure(LessonErrors.AlreadyPublished);
 
         // нельзя публиковать урок без контента
         if (string.IsNullOrEmpty(ContentUrl)) 

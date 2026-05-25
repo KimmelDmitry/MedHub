@@ -74,6 +74,13 @@ public sealed class Permission
 
     public static readonly Permission MediaProcess = new(32, "media:process");
 
+    // Enrollments
+    public static readonly Permission EnrollmentsRead = new(33, "enrollments:read");
+
+    public static readonly Permission EnrollmentsCreate = new(34, "enrollments:create");
+
+    public static readonly Permission EnrollmentsCancel = new(35, "enrollments:cancel");
+
     private Permission(int id, string name)
     {
         Id = id;

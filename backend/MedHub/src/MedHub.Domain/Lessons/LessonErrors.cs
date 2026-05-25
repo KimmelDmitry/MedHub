@@ -5,6 +5,7 @@ namespace MedHub.Domain.Lessons;
 public static class LessonErrors
 {
     public static Error NotFound => new("Lesson.NotFound", "Урок не найден");
+    public static Error AlreadyPublished => new("Lesson.AlreadyPublished", "Урок уже опубликован");
     
     public static Error InvalidStatusTransition => new(
         "Lesson.InvalidStatusTransition", 

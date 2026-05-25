@@ -19,6 +19,9 @@ public static class AttemptErrors
     public static readonly Error AlreadyCompleted =
         new("Attempt.AlreadyCompleted", "Попытка уже завершена");
 
+    public static readonly Error NotCompleted =
+        new("Attempt.NotCompleted", "Попытка ещё не завершена");
+
     public static readonly Error InvalidScore =
         new("Attempt.InvalidScore", "Некорректный балл");
 

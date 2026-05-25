@@ -69,3 +69,100 @@ nunit-*.xml
 **/.idea/
 **/*.suo
 **/*.userprefs
+
+# === Frontend / Node ===
+**/node_modules/
+**/dist/
+**/build/
+**/.vite/
+**/.next/
+**/coverage/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/.eslintcache
+
+# === Environment files ===
+.env
+.env.*
+!.env.example
+!.env.template
+
+# === Docker / local runtime ===
+docker-compose.override.yml
+**/.docker/
+**/.containers/
+*.pid
+
+# === Local databases / dumps / backups ===
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.dump
+*.sql
+*.tar
+*.gz
+*.zip
+
+# === Logs ===
+*.log
+logs/
+Logs/
+**/logs/
+**/Logs/
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === VS Code ===
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# === Rider / JetBrains ===
+.idea/
+*.sln.iml
+
+# === Test / reports ===
+TestResults/
+coverage/
+playwright-report/
+test-results/
+
+# === MedHub local artifacts ===
+dev-seed-smoke-report.json
+
+# === Frontend / Node ===
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/pnpm-debug.log*
+**/.eslintcache
+
+# === Env ===
+.env
+.env.*
+!.env.example
+
+# === Docker/local runtime data ===
+backend/MedHub/containers/identity/h2/
+**/.containers/
+**/docker-compose.generated.override.yml
+
+# === Local reports ===
+dev-seed-smoke-report.json
+
+# === OS/IDE ===
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example

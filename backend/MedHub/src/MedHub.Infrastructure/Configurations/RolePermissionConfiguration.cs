@@ -39,6 +39,11 @@ internal sealed class RolePermissionConfiguration : IEntityTypeConfiguration<Rol
             Create(Role.Student, Permission.AttemptsSubmit),
             Create(Role.Student, Permission.AttemptsCancel),
 
+            // Enrollments
+            Create(Role.Student, Permission.EnrollmentsRead),
+            Create(Role.Student, Permission.EnrollmentsCreate),
+            Create(Role.Student, Permission.EnrollmentsCancel),
+
             // Media
             Create(Role.Student, Permission.MediaRead),
 
@@ -67,6 +72,7 @@ internal sealed class RolePermissionConfiguration : IEntityTypeConfiguration<Rol
             Create(Role.Teacher, Permission.CheckpointsRead),
             Create(Role.Teacher, Permission.CheckpointsCreate),
             Create(Role.Teacher, Permission.CheckpointsUpdate),
+            Create(Role.Teacher, Permission.CheckpointsDelete),
             Create(Role.Teacher, Permission.CheckpointsPublish),
             Create(Role.Teacher, Permission.CheckpointsArchive),
 
@@ -129,6 +135,11 @@ internal sealed class RolePermissionConfiguration : IEntityTypeConfiguration<Rol
             Create(Role.Admin, Permission.AttemptsSubmit),
             Create(Role.Admin, Permission.AttemptsCancel),
             Create(Role.Admin, Permission.AttemptsEvaluate),
+
+            // Enrollments
+            Create(Role.Admin, Permission.EnrollmentsRead),
+            Create(Role.Admin, Permission.EnrollmentsCreate),
+            Create(Role.Admin, Permission.EnrollmentsCancel),
 
             // Media
             Create(Role.Admin, Permission.MediaRead),

@@ -172,12 +172,7 @@ public sealed class Checkpoint : Entity
     {
         if (Status == CheckpointStatus.Published)
         {
-            return Result.Success();
-        }
-
-        if (Status == CheckpointStatus.Archived)
-        {
-            return Result.Failure(CheckpointErrors.InvalidTransition);
+            return Result.Failure(CheckpointErrors.AlreadyPublished);
         }
 
         if (IsGraded && _questions.Count == 0)

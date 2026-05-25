@@ -74,7 +74,6 @@ internal sealed class VideoProcessingService : IVideoProcessingService
         }
 
         var workingDir = Path.Combine(_options.TempRootPath, video.Id.ToString("N"));
-        Directory.CreateDirectory(workingDir);
 
         var sourceKey = video.StorageKey;
         if (string.IsNullOrWhiteSpace(sourceKey))
@@ -90,6 +89,8 @@ internal sealed class VideoProcessingService : IVideoProcessingService
 
         try
         {
+            Directory.CreateDirectory(workingDir);
+
             await _storage.DownloadFileAsync(sourceKey, sourcePath, cancellationToken);
 
             var probe = await _probeAnalyzer.AnalyzeAsync(sourcePath, cancellationToken);

@@ -35,6 +35,11 @@ internal static class Permissions
     // =========================
     
     public const string CheckpointsRead = "checkpoints:read";
+    public const string CheckpointsCreate = "checkpoints:create";
+    public const string CheckpointsUpdate = "checkpoints:update";
+    public const string CheckpointsDelete = "checkpoints:delete";
+    public const string CheckpointsPublish = "checkpoints:publish";
+    public const string CheckpointsArchive = "checkpoints:archive";
     public const string CheckpointsWrite = "checkpoints:write";
     
     // =========================
@@ -42,14 +47,28 @@ internal static class Permissions
     // =========================
     
     public const string QuestionsRead = "questions:read";
-    public const string QuestionsWrite = "questions:write";
+    public const string QuestionsCreate = "questions:create";
+    public const string QuestionsUpdate = "questions:update";
+    public const string QuestionsDelete = "questions:delete";
     
     // =========================
     // ATTEMPTS
     // =========================
-    
+
     public const string AttemptsRead = "attempts:read";
     public const string AttemptsWrite = "attempts:write";
+    public const string AttemptsStart = "attempts:start";
+    public const string AttemptsSubmit = "attempts:submit";
+    public const string AttemptsCancel = "attempts:cancel";
+    public const string AttemptsEvaluate = "attempts:evaluate";
+
+    // =========================
+    // ENROLLMENTS
+    // =========================
+
+    public const string EnrollmentsRead = "enrollments:read";
+    public const string EnrollmentsCreate = "enrollments:create";
+    public const string EnrollmentsCancel = "enrollments:cancel";
 
     // =========================
     // MEDIA / VIDEO

@@ -12,6 +12,9 @@ internal sealed class AnswerConfiguration : IEntityTypeConfiguration<Answer>
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id)
+            .ValueGeneratedNever();
+
         builder.Property(x => x.AttemptId)
             .HasColumnName("attempt_id")
             .IsRequired();

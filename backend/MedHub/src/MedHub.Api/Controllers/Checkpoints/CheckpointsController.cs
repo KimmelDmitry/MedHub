@@ -37,7 +37,7 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return NotFound(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
@@ -55,14 +55,14 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
     }
 
     [HttpPost]
-    [HasPermission(Permissions.CheckpointsWrite)]
+    [HasPermission(Permissions.CheckpointsCreate)]
     public async Task<IActionResult> Create(
         [FromBody] CreateCheckpointRequest request,
         CancellationToken cancellationToken)
@@ -79,14 +79,14 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return Ok(result.Value);
     }
 
     [HttpPatch("{checkpointId:guid}")]
-    [HasPermission(Permissions.CheckpointsWrite)]
+    [HasPermission(Permissions.CheckpointsUpdate)]
     public async Task<IActionResult> Update(
         Guid checkpointId,
         [FromBody] UpdateCheckpointRequest request,
@@ -104,14 +104,14 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return NoContent();
     }
 
     [HttpPost("{checkpointId:guid}/publish")]
-    [HasPermission(Permissions.CheckpointsWrite)]
+    [HasPermission(Permissions.CheckpointsPublish)]
     public async Task<IActionResult> Publish(
         Guid checkpointId,
         CancellationToken cancellationToken)
@@ -122,14 +122,14 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return NoContent();
     }
 
     [HttpPost("{checkpointId:guid}/archive")]
-    [HasPermission(Permissions.CheckpointsWrite)]
+    [HasPermission(Permissions.CheckpointsArchive)]
     public async Task<IActionResult> Archive(
         Guid checkpointId,
         CancellationToken cancellationToken)
@@ -140,14 +140,14 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return NoContent();
     }
 
     [HttpDelete("{checkpointId:guid}")]
-    [HasPermission(Permissions.CheckpointsWrite)]
+    [HasPermission(Permissions.CheckpointsDelete)]
     public async Task<IActionResult> Delete(
         Guid checkpointId,
         CancellationToken cancellationToken)
@@ -158,9 +158,24 @@ public sealed class CheckpointsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return HandleFailure(result.Error);
         }
 
         return NoContent();
+    }
+
+    private IActionResult HandleFailure(Error error)
+    {
+        if (error.Code.EndsWith(".Forbidden", StringComparison.Ordinal))
+        {
+            return Forbid();
+        }
+
+        if (error.Code.EndsWith(".NotFound", StringComparison.Ordinal))
+        {
+            return NotFound(error);
+        }
+
+        return BadRequest(error);
     }
 }

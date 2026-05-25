@@ -52,11 +52,11 @@ public sealed class S3VideoStorageProvider : IVideoStorageProvider
                 BucketName = _bucketName,
                 Key = objectKey,
                 Verb = HttpVerb.PUT,
+                Protocol = Protocol.HTTP,
+                UploadId = uploadId,
+                PartNumber = partNumber,
                 Expires = DateTime.UtcNow.AddHours(1)
             };
-
-            request.Parameters["partNumber"] = partNumber.ToString();
-            request.Parameters["uploadId"] = uploadId;
 
             var url = _s3Client.GetPreSignedURL(request);
 
@@ -76,10 +76,9 @@ public sealed class S3VideoStorageProvider : IVideoStorageProvider
         {
             BucketName = _bucketName,
             Key = objectKey,
-            UploadId = uploadId
+            UploadId = uploadId,
+            PartETags = parts.Select(p => new PartETag(p.PartNumber, p.ETag)).ToList()
         };
-
-        request.PartETags.AddRange(parts.Select((p => new PartETag(p.PartNumber, p.ETag))));
 
         await _s3Client.CompleteMultipartUploadAsync(request, ct);
     }
@@ -123,12 +122,16 @@ public sealed class S3VideoStorageProvider : IVideoStorageProvider
         await responseStream.CopyToAsync(fileStream, ct);
     }
 
-    public async Task<Stream> OpenReadAsync(
+    public async Task<StorageObjectStream> OpenReadAsync(
         string objectKey,
         CancellationToken ct = default)
     {
         var response = await _s3Client.GetObjectAsync(_bucketName, objectKey, ct);
-        return response.ResponseStream;
+
+        return new StorageObjectStream(
+            response.ResponseStream,
+            response.Headers.ContentType,
+            response.Headers.ContentLength);
     }
 
     public async Task UploadStreamAsync(
@@ -158,7 +161,8 @@ public sealed class S3VideoStorageProvider : IVideoStorageProvider
             BucketName = _bucketName,
             Key = objectKey,
             Expires = DateTime.UtcNow.AddHours(1),
-            Verb = HttpVerb.GET
+            Verb = HttpVerb.GET,
+            Protocol = Protocol.HTTP
         };
 
         var url = _s3Client.GetPreSignedURL(request);

@@ -28,21 +28,58 @@ internal sealed class GetLoggedInUserQueryHandler
 
         const string sql = """
             SELECT
-                id AS Id,
-                first_name AS FirstName,
-                last_name AS LastName,
-                email AS Email
-            FROM users
-            WHERE identity_id = @IdentityId
+                u.id AS Id,
+                u.first_name AS FirstName,
+                u.last_name AS LastName,
+                u.email AS Email,
+                r.name AS Role,
+                p.name AS Permission
+            FROM users u
+            JOIN role_user ru ON ru.users_id = u.id
+            JOIN roles r ON r.id = ru.roles_id
+            LEFT JOIN role_permissions rp ON rp.role_id = r.id
+            LEFT JOIN permissions p ON p.id = rp.permission_id
+            WHERE u.identity_id = @IdentityId
+            ORDER BY r.id DESC
             """;
 
-        var user = await connection.QuerySingleAsync<UserResponse>(
+        var rows = (await connection.QueryAsync<UserProfileRow>(
             sql,
             new
             {
                 _userContext.IdentityId
-            });
+            })).ToList();
 
-        return user;
+        var user = rows.First();
+
+        return new UserResponse
+        {
+            Id = user.Id,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Role = user.Role,
+            Permissions = rows
+                .Select(row => row.Permission)
+                .Where(permission => !string.IsNullOrWhiteSpace(permission))
+                .Select(permission => permission!)
+                .Distinct()
+                .ToList()
+        };
+    }
+
+    private sealed class UserProfileRow
+    {
+        public Guid Id { get; init; }
+
+        public string Email { get; init; } = string.Empty;
+
+        public string FirstName { get; init; } = string.Empty;
+
+        public string LastName { get; init; } = string.Empty;
+
+        public string Role { get; init; } = string.Empty;
+
+        public string? Permission { get; init; }
     }
 }

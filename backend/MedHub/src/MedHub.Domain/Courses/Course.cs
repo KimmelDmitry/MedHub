@@ -55,9 +55,6 @@ public sealed class Course : Entity
     {
         if (Status == CourseStatus.Published)
             return Result.Failure(CourseErrors.AlreadyPublished);
-
-        if (Status == CourseStatus.Archived)
-            return Result.Failure(CourseErrors.CannotPublishArchived);
         
         if (!Lessons.Any()) return Result.Failure(CourseErrors.NoLessons);
 

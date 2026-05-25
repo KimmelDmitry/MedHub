@@ -1,4 +1,4 @@
-﻿namespace MedHub.Application.Attempts.GetActiveAttemptForLesson;
+namespace MedHub.Application.Attempts.GetActiveAttemptForLesson;
 
 public sealed class ActiveAttemptResponse
 {
@@ -6,11 +6,11 @@ public sealed class ActiveAttemptResponse
 
     public Guid LessonId { get; init; }
 
-    public Guid UserId { get; init; }
+    public Guid StudentId { get; init; }
 
-    public DateTime StartedAtUtc { get; init; }
+    public DateTime StartedAt { get; init; }
 
-    public int Status { get; init; }
+    public string Status { get; init; } = string.Empty;
 
-    public int CurrentQuestionIndex { get; init; }
+    public Guid[] AnsweredQuestionIds { get; init; } = [];
 }

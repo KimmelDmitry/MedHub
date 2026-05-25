@@ -3,16 +3,31 @@
 public sealed record AttemptResultResponse(
     Guid AttemptId,
     Guid LessonId,
+    string Status,
     decimal Score,
     DateTime StartedAt,
     DateTime? CompletedAt,
-    string Status,
-    IReadOnlyCollection<AttemptAnswerResponse> Answers
+    int TotalQuestions,
+    int CorrectAnswers,
+    IReadOnlyCollection<AttemptAnswerReviewResponse> Answers
 );
 
-public sealed record AttemptAnswerResponse(
+public sealed record AttemptAnswerReviewResponse(
     Guid QuestionId,
+    Guid CheckpointId,
+    string? CheckpointTitle,
+    int TimestampSeconds,
+    string QuestionText,
+    string Type,
+    IReadOnlyCollection<AnswerOptionReviewResponse> SelectedOptions,
     bool IsCorrect,
+    bool RevealCorrectAnswer,
+    IReadOnlyCollection<AnswerOptionReviewResponse> CorrectOptions,
     string? TextAnswer,
-    IReadOnlyCollection<Guid> SelectedOptionIds
+    bool RequiresManualReview
+);
+
+public sealed record AnswerOptionReviewResponse(
+    Guid Id,
+    string Text
 );

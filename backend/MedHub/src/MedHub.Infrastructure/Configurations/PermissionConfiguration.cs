@@ -47,6 +47,10 @@ internal sealed class PermissionConfiguration : IEntityTypeConfiguration<Permiss
             Permission.AttemptsCancel,
             Permission.AttemptsEvaluate,
 
+            Permission.EnrollmentsRead,
+            Permission.EnrollmentsCreate,
+            Permission.EnrollmentsCancel,
+
             Permission.MediaRead,
             Permission.MediaUpload,
             Permission.MediaDelete,

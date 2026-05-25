@@ -38,6 +38,10 @@ public interface IVideoStorageProvider
         string contentType,
         CancellationToken ct = default);
 
+    Task<StorageObjectStream> OpenReadAsync(
+        string objectKey,
+        CancellationToken ct = default);
+
     Task<string> GetPlaybackUrlAsync(
         string objectKey,
         CancellationToken ct = default);
@@ -46,3 +50,8 @@ public interface IVideoStorageProvider
 public sealed record MultipartUploadInitDto(
     string UploadId
 );
+
+public sealed record StorageObjectStream(
+    Stream Content,
+    string? ContentType,
+    long? ContentLength);

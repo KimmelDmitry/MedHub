@@ -31,6 +31,16 @@ internal sealed class QuestionRepository : Repository<Question>, IQuestionReposi
             .ToListAsync(cancellationToken);
     }
 
+    public void Add(Question question)
+    {
+        DbContext.Set<Question>().Add(question);
+    }
+
+    public void AddAnswerOption(AnswerOption answerOption)
+    {
+        DbContext.Set<AnswerOption>().Add(answerOption);
+    }
+
     public void Remove(Question question)
     {
         DbContext.Set<Question>().Remove(question);
